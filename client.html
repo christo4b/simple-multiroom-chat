@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> Entelo Chat </title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <ul id="messages"></ul>
+    <form id="form">
+        <input type="text" id="message"/>
+        <input type="submit"/>
+    </form>
+</body>
+
+<script>
+    // JQ document ready 
+    $(function(){
+        // Connect to the host
+        var socket = io.connect("http://localhost:3000");
+
+        // Stored the URL (room)
+        var room = window.location.pathname;
+
+        // Listen for messages sent from server, append to page
+        socket.on(room, function(data){
+            $('#messages').append('<li>' + data.message + '</li>');
+        }); 
+        
+        // Emit message from form, append to page, clear form, prevent submit default refresh action
+        $('#form').on('submit', function(e){
+            socket.emit('message', { message: $('#message').val(), room: room});
+            $('#messages').append('<li>' + $('#message').val() + '</li>');
+            $('#message').val('');
+            e.preventDefault();
+        });
+    });
+
+</script>
+</html>
